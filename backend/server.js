@@ -90,7 +90,4 @@ app.get('/api/auth/session', (req, res) => {
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
-app.listen(PORT, () => {
-  console.log(`Sanchaar auth backend running at http://localhost:${PORT}`);
-  console.log(`Demo login → Agency: DEMO · Employee ID: DEMO1 · Passcode: 0000`);
-});
+module.exports = app;
