@@ -87,7 +87,9 @@ app.get('/api/auth/session', (req, res) => {
   if (!session) return res.status(401).json({ error: 'Invalid or expired session' });
   res.json({ employee: session });
 });
-
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
-module.exports = app;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Sanchaar backend running on port ${PORT}`);
+  console.log(`Demo login → Agency: DEMO · Employee ID: DEMO1 · Passcode: 0000`);
+});
