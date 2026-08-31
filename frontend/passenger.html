@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sanchaar — Find your bus</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="page-header">
+  <nav class="topnav">
+    <div class="brand">
+      <span class="brand-mark">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 16V7a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="4" y="16" width="16" height="3" rx="1.5" stroke="currentColor" stroke-width="2"/><circle cx="7.5" cy="21" r="1.3" fill="currentColor"/><circle cx="16.5" cy="21" r="1.3" fill="currentColor"/></svg>
+      </span>
+      Sanchaar
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="passenger.html" class="active">Find buses</a></li>
+      <li><a href="route.html">Route map</a></li>
+      <li><a href="#">Alerts</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="menu-toggle btn btn-ghost-light btn-sm" aria-label="Menu">☰</button>
+      <a href="login.html" class="btn btn-teal btn-sm">Authority login</a>
+    </div>
+  </nav>
+
+  <div class="page-heading" style="text-align:center;">
+    <h1>Hello, Passenger 👋</h1>
+    <p>Where are you going today?</p>
+  </div>
+
+  <div class="search-widget">
+    <div class="trip-row">
+      <div class="trip-field">
+        <label for="fromInput">From</label>
+        <input type="text" id="fromInput" value="University Gate" placeholder="Enter starting point" autocomplete="off">
+        <div class="suggest-list" id="fromSuggest" role="listbox"></div>
+      </div>
+      <button class="swap-btn" id="swapBtn" aria-label="Swap stops">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M7 7h13m0 0-4-4m4 4-4 4M17 17H4m0 0 4 4m-4-4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="trip-field" style="text-align:right;">
+        <label for="toInput">To</label>
+        <input type="text" id="toInput" value="Railway Station" placeholder="Enter destination" autocomplete="off" style="text-align:right;">
+        <div class="suggest-list" id="toSuggest" role="listbox"></div>
+      </div>
+    </div>
+    <div class="trip-divider"></div>
+    <button class="btn btn-indigo btn-block" id="findBusesBtn">Find buses</button>
+  </div>
+</header>
+
+<section class="web-section" id="busResults">
+  <div class="section-label">Available buses<span id="busRouteLabel" style="font-weight:400; opacity:.6;"></span></div>
+
+  <!-- Populated dynamically by renderBusCards() in script.js — different
+       From/To pairs now produce different buses, ETAs and occupancy. -->
+  <div class="bus-grid" id="busGrid"></div>
+</section>
+
+<footer class="footer">
+  <div class="container">Sanchaar — real-time public transport intelligence for passengers and city authorities.</div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

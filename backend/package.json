@@ -1,0 +1,14 @@
+{
+  "name": "sanchaar-backend",
+  "version": "1.0.0",
+  "description": "API for Sanchaar's live network map — per-city stops and occupancy",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "mysql2": "^3.10.0"
+  }
+}

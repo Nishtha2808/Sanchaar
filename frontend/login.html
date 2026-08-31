@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sanchaar — Authority login</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Scoped styles for the login/OTP card — kept self-contained so this
+     page doesn't depend on markup structures (like .trip-row) that were
+     built for a different layout. Reuses the same CSS custom properties
+     (--navy-950, --teal-500, --font-display, etc.) already defined
+     globally in style.css. */
+
+  .auth-shell{
+    min-height:calc(100vh - 64px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px 16px;
+    background:var(--navy-950, #0b1220);
+  }
+  .auth-card{
+    width:100%;
+    max-width:420px;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:16px;
+    padding:28px 24px;
+    color:#fff;
+  }
+  .auth-eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:.72rem;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--teal-400, #17c3b2);
+    margin-bottom:6px;
+  }
+  .auth-title{
+    font-family:var(--font-display, 'Space Grotesk', sans-serif);
+    font-weight:700;
+    font-size:1.4rem;
+    margin-bottom:4px;
+  }
+  .auth-sub{
+    font-size:.85rem;
+    color:rgba(255,255,255,.55);
+    margin-bottom:22px;
+  }
+  .auth-field{
+    margin-bottom:16px;
+  }
+  .auth-field label{
+    display:block;
+    font-size:.75rem;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:rgba(255,255,255,.5);
+    margin-bottom:6px;
+  }
+  .auth-field select,
+  .auth-field input{
+    width:100%;
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.14);
+    color:#fff;
+    font-family:'Space Grotesk', sans-serif;
+    font-size:.95rem;
+    font-weight:600;
+    padding:12px 14px;
+    border-radius:10px;
+    outline:none;
+    box-sizing:border-box;
+  }
+  .auth-field select:focus,
+  .auth-field input:focus{
+    border-color:var(--teal-400, #17c3b2);
+  }
+  .auth-field select{
+    appearance:none; -webkit-appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23ffffff'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 14px center;
+    padding-right:32px;
+  }
+  .auth-field select option{ background:#0b1220; color:#fff; }
+  .auth-field input::placeholder{ color:rgba(255,255,255,.35); }
+
+  .otp-input{
+    text-align:center;
+    font-size:1.6rem !important;
+    letter-spacing:.5em;
+    padding-left:20px !important; /* visually center given the letter-spacing */
+  }
+
+  .auth-error{
+    display:none;
+    background:rgba(255,71,87,.12);
+    border:1px solid rgba(255,71,87,.35);
+    color:#ff8a94;
+    font-size:.82rem;
+    padding:10px 12px;
+    border-radius:8px;
+    margin-bottom:16px;
+  }
+  .auth-error.show{ display:block; }
+
+  .auth-hint{
+    display:none;
+    background:rgba(23,195,178,.1);
+    border:1px dashed rgba(23,195,178,.4);
+    color:var(--teal-400, #17c3b2);
+    font-family:'JetBrains Mono', monospace;
+    font-size:.78rem;
+    padding:9px 12px;
+    border-radius:8px;
+    margin-bottom:16px;
+  }
+  .auth-hint.show{ display:block; }
+
+  .auth-meta-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-top:14px;
+    font-size:.8rem;
+  }
+  .auth-timer{ color:rgba(255,255,255,.5); font-family:'JetBrains Mono', monospace; }
+  .auth-link-btn{
+    background:none; border:none; padding:0;
+    color:var(--teal-400, #17c3b2);
+    font-family:'Space Grotesk', sans-serif;
+    font-size:.8rem; font-weight:600;
+    cursor:pointer;
+  }
+  .auth-link-btn:disabled{ color:rgba(255,255,255,.3); cursor:not-allowed; }
+
+  .auth-back{
+    display:inline-block;
+    margin-top:18px;
+    font-size:.8rem;
+    color:rgba(255,255,255,.5);
+    cursor:pointer;
+    background:none; border:none; padding:0;
+  }
+  .auth-back:hover{ color:#fff; }
+
+  .auth-step{ display:none; }
+  .auth-step.active{ display:block; }
+
+  .auth-demo-note{
+    margin-top:20px;
+    font-size:.72rem;
+    color:rgba(255,255,255,.35);
+    font-family:'JetBrains Mono', monospace;
+    line-height:1.5;
+  }
+</style>
+</head>
+<body>
+
+<header class="page-header" style="padding-bottom:0;">
+  <nav class="topnav">
+    <div class="brand">
+      <span class="brand-mark">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 16V7a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="4" y="16" width="16" height="3" rx="1.5" stroke="currentColor" stroke-width="2"/><circle cx="7.5" cy="21" r="1.3" fill="currentColor"/><circle cx="16.5" cy="21" r="1.3" fill="currentColor"/></svg>
+      </span>
+      Sanchaar
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="passenger.html">Find buses</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="index.html" class="btn btn-ghost-light btn-sm">← Back home</a>
+    </div>
+  </nav>
+</header>
+
+<div class="auth-shell">
+  <div class="auth-card">
+    <p class="auth-eyebrow">Authority access</p>
+
+    <!-- ===================== Step 1: credentials ===================== -->
+    <div class="auth-step active" id="credStep">
+      <div class="auth-title">Sign in</div>
+      <p class="auth-sub">Enter your agency and employee details to continue.</p>
+
+      <div class="auth-error" id="credError"></div>
+
+      <form id="credForm">
+        <div class="auth-field">
+          <label for="agencyCode">Agency code</label>
+          <select id="agencyCode" required>
+            <option value="">Loading agencies…</option>
+          </select>
+        </div>
+
+        <!-- Shows the demo employee ID / passcode for whichever agency is
+             currently selected above, so new users aren't stuck on an
+             unfamiliar agency without knowing what to type. -->
+        <div class="auth-hint" id="credHint"></div>
+
+        <div class="auth-field">
+          <label for="employeeId">Employee ID</label>
+          <input type="text" id="employeeId" placeholder="e.g. EMP1001" autocomplete="username" required>
+        </div>
+
+        <div class="auth-field">
+          <label for="passcode">Secret passcode / PIN</label>
+          <input type="password" id="passcode" placeholder="••••" inputmode="numeric" autocomplete="current-password" required>
+        </div>
+
+        <button type="submit" class="btn btn-teal btn-block" id="credSubmitBtn">Continue</button>
+      </form>
+
+      <p class="auth-demo-note">
+        Demo: Agency <strong>DEMO</strong> · Employee ID <strong>DEMO1</strong> · Passcode <strong>0000</strong>
+      </p>
+    </div>
+
+    <!-- ===================== Step 2: OTP ===================== -->
+    <div class="auth-step" id="otpStep">
+      <div class="auth-title">Verify OTP</div>
+      <p class="auth-sub" id="otpSub">Enter the 6-digit code sent to your registered number.</p>
+
+      <div class="auth-error" id="otpError"></div>
+      <div class="auth-hint" id="devOtpHint"></div>
+
+      <form id="otpForm">
+        <div class="auth-field">
+          <label for="otpInput">One-time passcode</label>
+          <input type="text" id="otpInput" class="otp-input" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="------" autocomplete="one-time-code" required>
+        </div>
+
+        <button type="submit" class="btn btn-teal btn-block" id="verifyOtpBtn">Verify OTP</button>
+      </form>
+
+      <div class="auth-meta-row">
+        <span class="auth-timer" id="otpTimer">Expires in 5:00</span>
+        <button type="button" class="auth-link-btn" id="resendOtpBtn" disabled>Resend OTP</button>
+      </div>
+
+      <button type="button" class="auth-back" id="backToLoginBtn">← Use a different account</button>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">Sanchaar — real-time public transport intelligence for passengers and city authorities.</div>
+</footer>
+
+<script src="script.js"></script>
+<script>
+/* ============================================================
+   Authority login — talks to the backend in /backend
+   (server.js + authStore.js). Run that server on :4000 before
+   testing this page. See backend/README.md.
+   ============================================================ */
+
+// Backend runs on a different port than the static frontend (e.g. Live
+// Server on :5500), so this must be an absolute URL, not a relative
+// "/api/..." path. Point this at your deployed API origin in production,
+// or serve the frontend from the same origin as the API and switch to ''.
+const API_BASE = 'http://localhost:4000';
+
+const FALLBACK_AGENCIES = [
+  { code: 'DEMO', name: 'Sanchaar Demo Authority' },
+  { code: 'DTC', name: 'Delhi Transport Corporation' },
+  { code: 'BMTC', name: 'Bangalore Metropolitan Transport Corporation' },
+];
+
+// Demo-only credentials per agency, mirrored from authStore.js's seed
+// data, so the sign-in hint can show the right values no matter which
+// agency the person has selected. This is prototype-only — remove once
+// real accounts/SSO are wired up.
+const AGENCY_DEMO_CREDS = {
+  DTC: [
+    { employeeId: 'EMP1001', passcode: '4821' },
+    { employeeId: 'EMP1002', passcode: '7734' },
+  ],
+  BMTC: [
+    { employeeId: 'EMP2001', passcode: '5590' },
+  ],
+  DEMO: [
+    { employeeId: 'DEMO1', passcode: '0000' },
+  ],
+};
+
+const credStep = document.getElementById('credStep');
+const otpStep = document.getElementById('otpStep');
+const credForm = document.getElementById('credForm');
+const otpForm = document.getElementById('otpForm');
+const credError = document.getElementById('credError');
+const otpError = document.getElementById('otpError');
+const devOtpHint = document.getElementById('devOtpHint');
+const credHint = document.getElementById('credHint');
+const credSubmitBtn = document.getElementById('credSubmitBtn');
+const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+const resendOtpBtn = document.getElementById('resendOtpBtn');
+const backToLoginBtn = document.getElementById('backToLoginBtn');
+const otpTimerEl = document.getElementById('otpTimer');
+const otpSub = document.getElementById('otpSub');
+const agencySelect = document.getElementById('agencyCode');
+const otpInput = document.getElementById('otpInput');
+
+let tempToken = null;
+let countdownInterval = null;
+
+function showError(el, message) {
+  el.textContent = message;
+  el.classList.add('show');
+}
+function clearError(el) {
+  el.textContent = '';
+  el.classList.remove('show');
+}
+function setBtnLoading(btn, loading, idleLabel) {
+  btn.disabled = loading;
+  btn.textContent = loading ? 'Please wait…' : idleLabel;
+}
+
+/* ---- show/update the "type this in" hint for the selected agency ---- */
+function updateCredHint() {
+  const creds = AGENCY_DEMO_CREDS[agencySelect.value];
+  if (!creds || !creds.length) {
+    credHint.classList.remove('show');
+    return;
+  }
+  const label = creds
+    .map(c => `Employee ID ${c.employeeId} · Passcode ${c.passcode}`)
+    .join('  |  ');
+  credHint.textContent = `Try: ${label}`;
+  credHint.classList.add('show');
+}
+agencySelect.addEventListener('change', updateCredHint);
+
+/* ---- populate the Agency Code dropdown ---- */
+async function loadAgencies() {
+  let agencies = FALLBACK_AGENCIES;
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/agencies`, { signal: AbortSignal.timeout(2000) });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length) agencies = data;
+    }
+  } catch (e) {
+    // backend not reachable yet — fall back to the known demo list
+  }
+  agencySelect.innerHTML = '<option value="">Select agency</option>' +
+    agencies.map(a => `<option value="${a.code}">${a.name} (${a.code})</option>`).join('');
+  updateCredHint();
+}
+loadAgencies();
+
+/* ---- OTP countdown ---- */
+function startCountdown(seconds) {
+  clearInterval(countdownInterval);
+  let remaining = Math.max(0, Math.floor(seconds));
+  resendOtpBtn.disabled = true;
+
+  function tick() {
+    const mm = Math.floor(remaining / 60);
+    const ss = String(remaining % 60).padStart(2, '0');
+    otpTimerEl.textContent = remaining > 0 ? `Expires in ${mm}:${ss}` : 'OTP expired';
+    if (remaining <= 0) {
+      clearInterval(countdownInterval);
+      verifyOtpBtn.disabled = true;
+      resendOtpBtn.disabled = false;
+      return;
+    }
+    remaining -= 1;
+  }
+  tick();
+  countdownInterval = setInterval(tick, 1000);
+}
+
+/* ---- Step 1: submit credentials ---- */
+credForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  clearError(credError);
+
+  const agencyCode = agencySelect.value;
+  const employeeId = document.getElementById('employeeId').value.trim();
+  const passcode = document.getElementById('passcode').value.trim();
+
+  if (!agencyCode || !employeeId || !passcode) {
+    showError(credError, 'Please fill in all three fields.');
+    return;
+  }
+
+  setBtnLoading(credSubmitBtn, true);
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ agencyCode, employeeId, passcode }),
+      signal: AbortSignal.timeout(5000),
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      showError(credError, data.error || 'Login failed. Please check your details.');
+      return;
+    }
+
+    tempToken = data.tempToken;
+    otpSub.textContent = `Enter the 6-digit code sent to Employee ID ${employeeId}.`;
+    otpInput.value = '';
+    clearError(otpError);
+
+    if (data.devOtp) {
+      devOtpHint.textContent = `Dev mode — OTP is ${data.devOtp} (no SMS gateway connected yet)`;
+      devOtpHint.classList.add('show');
+    } else {
+      devOtpHint.classList.remove('show');
+    }
+
+    verifyOtpBtn.disabled = false;
+    startCountdown(data.expiresInSeconds || 300);
+    credStep.classList.remove('active');
+    otpStep.classList.add('active');
+    otpInput.focus();
+  } catch (err) {
+    showError(credError, 'Could not reach the server. Is the backend running on ' + API_BASE + '?');
+  } finally {
+    setBtnLoading(credSubmitBtn, false, 'Continue');
+  }
+});
+
+/* ---- Step 2: verify OTP ---- */
+otpForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  clearError(otpError);
+
+  const otp = otpInput.value.trim();
+  if (!otp) {
+    showError(otpError, 'Enter the OTP you received.');
+    return;
+  }
+
+  setBtnLoading(verifyOtpBtn, true);
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/verify-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tempToken, otp }),
+      signal: AbortSignal.timeout(5000),
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      let msg = data.error || 'Incorrect OTP.';
+      if (typeof data.attemptsRemaining === 'number') msg += ` (${data.attemptsRemaining} attempt(s) left)`;
+      showError(otpError, msg);
+      return;
+    }
+
+    clearInterval(countdownInterval);
+    localStorage.setItem('sanchaarAuthToken', data.token);
+    localStorage.setItem('sanchaarAuthEmployee', JSON.stringify(data.employee));
+    window.location.href = 'dashboard.html';
+  } catch (err) {
+    showError(otpError, 'Could not reach the server. Is the backend running on ' + API_BASE + '?');
+  } finally {
+    setBtnLoading(verifyOtpBtn, false, 'Verify OTP');
+  }
+});
+
+/* ---- resend OTP ---- */
+resendOtpBtn.addEventListener('click', async () => {
+  clearError(otpError);
+  resendOtpBtn.disabled = true;
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/resend-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tempToken }),
+      signal: AbortSignal.timeout(5000),
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      showError(otpError, data.error || 'Could not resend OTP — please log in again.');
+      return;
+    }
+
+    if (data.devOtp) {
+      devOtpHint.textContent = `Dev mode — OTP is ${data.devOtp} (no SMS gateway connected yet)`;
+      devOtpHint.classList.add('show');
+    }
+    verifyOtpBtn.disabled = false;
+    startCountdown(data.expiresInSeconds || 300);
+  } catch (err) {
+    showError(otpError, 'Could not reach the server. Is the backend running on ' + API_BASE + '?');
+    resendOtpBtn.disabled = false;
+  }
+});
+
+/* ---- back to step 1 ---- */
+backToLoginBtn.addEventListener('click', () => {
+  clearInterval(countdownInterval);
+  tempToken = null;
+  otpStep.classList.remove('active');
+  credStep.classList.add('active');
+  clearError(otpError);
+  clearError(credError);
+  document.getElementById('passcode').value = '';
+});
+</script>
+</body>
+</html>
