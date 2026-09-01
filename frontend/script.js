@@ -4,6 +4,7 @@
 
 /* Known stops on the Sanchaar network. In a real deployment this would
    come from a live stops/geocoding API instead of a static list. */
+ const API_BASE = 'https://sanchaar.onrender.com';
 const SANCHAAR_STOPS = [
   { name: 'University Gate',    tag: 'Campus stop · high demand' },
   { name: 'Railway Station',    tag: 'Transit hub' },
@@ -269,7 +270,7 @@ async function loadBuses(from, to) {
 
   // Try the real backend first
   try {
-    const res = await fetch(`/api/buses?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`, {
+   const res = await fetch(`${API_BASE}/api/buses?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`, {
       signal: AbortSignal.timeout(1500)
     });
     if (res.ok) {
