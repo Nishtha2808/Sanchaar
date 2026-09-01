@@ -1,7 +1,3 @@
-/* ============================================================
-   Sanchaar backend — auth prototype
-   Run: npm install && npm start   (see README.md)
-   ============================================================ */
 
 const express = require('express');
 const cors = require('cors');
