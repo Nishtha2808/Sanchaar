@@ -44,7 +44,13 @@ const sessions = new Map();
 
 const OTP_TTL_MS = 5 * 60 * 1000;      // OTP valid for 5 minutes
 const MAX_OTP_ATTEMPTS = 5;
-const IS_DEV = process.env.NODE_ENV !== 'production';
+
+// Controls whether OTPs are exposed in API responses for easy testing.
+// Defaults to ON so it keeps working on hosts (like Render) that set
+// NODE_ENV=production automatically, even though this is still a demo.
+// Set SHOW_DEV_OTP=false as an env var once a real SMS/email provider
+// is wired up and you no longer want OTPs echoed back in responses.
+const IS_DEV = process.env.SHOW_DEV_OTP !== 'false';
 
 function listAgencies() {
   return AGENCIES.map(a => ({ code: a.code, name: a.name }));
@@ -91,7 +97,7 @@ function verifyLogin(agencyCode, employeeId, passcode) {
     ok: true,
     tempToken,
     expiresInSeconds: OTP_TTL_MS / 1000,
-    // Only exposed outside production so you can test without a real SMS gateway.
+    // Only exposed while SHOW_DEV_OTP isn't explicitly set to "false".
     devOtp: IS_DEV ? otp : undefined,
   };
 }
