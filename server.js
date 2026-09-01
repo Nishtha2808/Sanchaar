@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const pool = require('./db');
+const pool = require('./frontend/db');
 const authStore = require('./authStore');
 
 const app = express();

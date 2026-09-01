@@ -270,7 +270,7 @@ async function loadBuses(from, to) {
 
   // Try the real backend first
   try {
-   const res = await fetch(`${API_BASE}/api/buses?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`, {
+   const res = await fetch(`${API_BASE}/api/buses?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`, { 
       signal: AbortSignal.timeout(1500)
     });
     if (res.ok) {
@@ -279,7 +279,7 @@ async function loadBuses(from, to) {
         renderBusCards(data, from, to);
         return;
       }
-    }
+    }       
   } catch (e) {
     // backend not reachable — fall through to demo generator
   }
