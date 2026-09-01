@@ -255,16 +255,12 @@
 <script src="script.js"></script>
 <script>
 /* ============================================================
-   Authority login — talks to the backend in /backend
-   (server.js + authStore.js). Run that server on :4000 before
-   testing this page. See backend/README.md.
+   Authority login — talks to the backend deployed on Render.
+   API_BASE is already declared in script.js (loaded above), so
+   it is NOT redeclared here — doing so throws a SyntaxError that
+   silently kills this entire inline script block, which is why
+   the agency dropdown was stuck on "Loading agencies…" before.
    ============================================================ */
-
-// Backend runs on a different port than the static frontend (e.g. Live
-// Server on :5500), so this must be an absolute URL, not a relative
-// "/api/..." path. Point this at your deployed API origin in production,
-// or serve the frontend from the same origin as the API and switch to ''.
-const API_BASE = 'http://localhost:4000';
 
 const FALLBACK_AGENCIES = [
   { code: 'DEMO', name: 'Sanchaar Demo Authority' },
@@ -337,17 +333,22 @@ function updateCredHint() {
 }
 agencySelect.addEventListener('change', updateCredHint);
 
-/* ---- populate the Agency Code dropdown ---- */
+/* ---- populate the Agency Code dropdown ----
+   Render's free tier spins down when idle, so the first request after
+   a period of inactivity can take 20–50s to wake the server. The
+   timeout below is bumped up from the original 2s so a cold start
+   doesn't get mistaken for "backend unreachable" and fall back to
+   demo agencies unnecessarily. ---- */
 async function loadAgencies() {
   let agencies = FALLBACK_AGENCIES;
   try {
-    const res = await fetch(`${API_BASE}/api/auth/agencies`, { signal: AbortSignal.timeout(2000) });
+    const res = await fetch(`${API_BASE}/api/auth/agencies`, { signal: AbortSignal.timeout(15000) });
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data) && data.length) agencies = data;
     }
   } catch (e) {
-    // backend not reachable yet — fall back to the known demo list
+    // backend not reachable (or still waking up) — fall back to the known demo list
   }
   agencySelect.innerHTML = '<option value="">Select agency</option>' +
     agencies.map(a => `<option value="${a.code}">${a.name} (${a.code})</option>`).join('');
@@ -397,7 +398,7 @@ credForm.addEventListener('submit', async (e) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ agencyCode, employeeId, passcode }),
-      signal: AbortSignal.timeout(5000),
+      signal: AbortSignal.timeout(15000),
     });
     const data = await res.json();
 
@@ -447,7 +448,7 @@ otpForm.addEventListener('submit', async (e) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ tempToken, otp }),
-      signal: AbortSignal.timeout(5000),
+      signal: AbortSignal.timeout(15000),
     });
     const data = await res.json();
 
@@ -478,7 +479,7 @@ resendOtpBtn.addEventListener('click', async () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ tempToken }),
-      signal: AbortSignal.timeout(5000),
+      signal: AbortSignal.timeout(15000),
     });
     const data = await res.json();
 
