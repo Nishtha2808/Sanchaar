@@ -1,3 +1,4 @@
+require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
@@ -84,7 +85,246 @@ app.get('/api/auth/session', (req, res) => {
   res.json({ employee: session });
 });
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
+app.get('/api/weather', async (req, res) => {
+  try {
+    const city = req.query.city || 'Ajmer';
 
+    const apiKey = process.env.OPENWEATHER_API_KEY;
+
+    if (!apiKey) {
+      return res.status(500).json({
+        error: 'OpenWeather API key is not configured'
+      });
+    }
+
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`;
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      return res.status(response.status).json({
+        error: 'Unable to fetch weather data'
+      });
+    }
+
+    const data = await response.json();
+
+    res.json({
+      city: data.name,
+      temperature: data.main.temp,
+      humidity: data.main.humidity,
+      weather: data.weather[0].main,
+      description: data.weather[0].description,
+      windSpeed: data.wind.speed
+    });
+
+  } catch (error) {
+    console.error('Weather API error:', error);
+
+    res.status(500).json({
+      error: 'Failed to fetch weather data'
+    });
+  }
+});
+
+// ===============================
+// TOMTOM TRAFFIC API
+// ===============================
+
+app.get('/api/traffic', async (req, res) => {
+  try {
+    // Delhi locations for testing
+    const origin = req.query.origin || '28.6129,77.2295';
+    const destination = req.query.destination || '28.6304,77.2177';
+
+    const apiKey = process.env.TOMTOM_API_KEY;
+
+    // Check API key
+    if (!apiKey) {
+      return res.status(500).json({
+        error: 'TomTom API key is not configured'
+      });
+    }
+
+    // TomTom Orbis Routing API
+    const url =
+      `https://api.tomtom.com/maps/orbis/routing/calculateRoute/` +
+      `${origin}:${destination}/json` +
+      `?apiVersion=2` +
+      `&key=${encodeURIComponent(apiKey)}` +
+      `&traffic=live` +
+      `&routeType=fast` +
+      `&travelMode=car`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'TomTom-Api-Version': '2'
+      }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error('TomTom API error:', data);
+
+      return res.status(response.status).json({
+        error: 'TomTom traffic API request failed',
+        details: data
+      });
+    }
+
+    if (!data.routes || data.routes.length === 0) {
+      return res.status(404).json({
+        error: 'No route found'
+      });
+    }
+
+    const route = data.routes[0];
+    const summary = route.summary;
+
+    // Traffic delay in seconds
+    const trafficDelay = summary.trafficDelayInSeconds || 0;
+
+    // Travel time in seconds
+    const travelTime = summary.travelTimeInSeconds || 0;
+
+    // Convert seconds to minutes
+    const travelTimeMinutes = Math.round(travelTime / 60);
+    const trafficDelayMinutes = Math.round(trafficDelay / 60);
+
+    // Determine traffic level
+    let trafficLevel;
+
+    if (trafficDelayMinutes >= 10) {
+      trafficLevel = 'HIGH';
+    } else if (trafficDelayMinutes >= 5) {
+      trafficLevel = 'MEDIUM';
+    } else {
+      trafficLevel = 'LOW';
+    }
+
+    res.json({
+      origin,
+      destination,
+
+      distanceMeters: summary.lengthInMeters,
+
+      travelTimeSeconds: travelTime,
+      travelTimeMinutes,
+
+      trafficDelaySeconds: trafficDelay,
+      trafficDelayMinutes,
+
+      trafficLevel
+    });
+
+  } catch (error) {
+    console.error('TomTom traffic error:', error);
+
+    res.status(500).json({
+      error: 'Failed to fetch traffic data'
+    });
+  }
+});
+// ===============================
+// NOMINATIM GEOCODING API
+// ===============================
+
+app.get('/api/geocode', async (req, res) => {
+  try {
+    const address = req.query.address;
+
+    if (!address) {
+      return res.status(400).json({
+        error: 'Please provide an address'
+      });
+    }
+
+    const url =
+      `https://nominatim.openstreetmap.org/search` +
+      `?format=jsonv2` +
+      `&q=${encodeURIComponent(address)}` +
+      `&limit=1`;
+
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Sanchaar-Bus-Demand-Prototype/1.0'
+      }
+    });
+
+    if (!response.ok) {
+      return res.status(response.status).json({
+        error: 'Geocoding service request failed'
+      });
+    }
+
+    const data = await response.json();
+
+    if (data.length === 0) {
+      return res.status(404).json({
+        error: 'Location not found'
+      });
+    }
+
+    const location = data[0];
+
+    res.json({
+      address: location.display_name,
+      latitude: Number(location.lat),
+      longitude: Number(location.lon)
+    });
+
+  } catch (error) {
+    console.error('Geocoding API error:', error);
+
+    res.status(500).json({
+      error: 'Failed to fetch location data'
+    });
+  }
+});
+// ===============================
+// AIR QUALITY API
+// ===============================
+
+app.get('/api/air-quality', async (req, res) => {
+  try {
+    // Delhi coordinates for testing
+    const latitude = req.query.lat || '28.6139';
+    const longitude = req.query.lon || '77.2090';
+
+    const url =
+      `https://air-quality-api.open-meteo.com/v1/air-quality` +
+      `?latitude=${latitude}` +
+      `&longitude=${longitude}` +
+      `&current=pm2_5,pm10`;
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      return res.status(response.status).json({
+        error: 'Unable to fetch air quality data'
+      });
+    }
+
+    const data = await response.json();
+
+    res.json({
+      latitude: Number(latitude),
+      longitude: Number(longitude),
+      pm2_5: data.current?.pm2_5,
+      pm10: data.current?.pm10
+    });
+
+  } catch (error) {
+    console.error('Air Quality API error:', error);
+
+    res.status(500).json({
+      error: 'Failed to fetch air quality data'
+    });
+  }
+});
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Sanchaar backend running on port ${PORT}`);
   console.log(`Demo login → Agency: DEMO · Employee ID: DEMO1 · Passcode: 0000`);
