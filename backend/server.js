@@ -414,6 +414,43 @@ app.post('/api/predict', async (req, res) => {
   }
 });
 
+app.post('/api/predict', async (req, res) => {
+  try {
+    const { location, date, time } = req.body || {};
+
+    if (!location || !date || !time) {
+      return res.status(400).json({
+        error: 'location, date and time are required'
+      });
+    }
+
+    const mlApiUrl = (
+      process.env.ML_API_URL ||
+      'https://sanchaar-ml-api.onrender.com'
+    ).replace(/\/+$/, '');
+
+    const response = await fetch(`${mlApiUrl}/predict`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ location, date, time })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return res.status(response.status).json(data);
+    }
+
+    return res.json(data);
+  } catch (error) {
+    console.error('ML prediction error:', error);
+    return res.status(502).json({
+      error: 'Unable to connect to the ML prediction service'
+    });
+  }
+});
+
+
 // ===============================
 // START SERVER
 // ===============================
