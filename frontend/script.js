@@ -838,3 +838,98 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 }); 
+
+/* ===== TinyFish Transport Updates ===== */
+
+const tinyfishForm = document.getElementById("tinyfish-form");
+
+if (tinyfishForm) {
+  tinyfishForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const query = document
+      .getElementById("tinyfish-query")
+      .value.trim();
+
+    const status = document.getElementById("tinyfish-status");
+    const results = document.getElementById("tinyfish-results");
+    const button = tinyfishForm.querySelector('button[type="submit"]');
+
+    if (!query) {
+      status.textContent = "Please enter a search query.";
+      return;
+    }
+
+    status.textContent = "Searching transport updates...";
+    results.replaceChildren();
+    button.disabled = true;
+
+    try {
+      const apiUrl =
+        "http://localhost:4000/api/tinyfish/search?q=" +
+        encodeURIComponent(query);
+
+   const response = await fetch('http://localhost:4000/api/tinyfish/search?q=' + encodeURIComponent(query));
+
+      const data = await response.json();3
+
+      if (!response.ok) {
+        throw new Error(data.error || "Search request failed.");
+      }
+
+      if (!Array.isArray(data.results) || data.results.length === 0) {
+        status.textContent = "No search results found.";
+        return;
+      }
+
+      data.results.forEach((item) => {
+        const card = document.createElement("div");
+        const heading = document.createElement("h3");
+        const description = document.createElement("p");
+        const source = document.createElement("p");
+        const link = document.createElement("a");
+
+        card.className = "mini-alert";
+        card.style.marginTop = "14px";
+        card.style.padding = "12px";
+        card.style.borderBottom = "1px solid #e5e7eb";
+
+        heading.textContent = item.title || "Untitled result";
+        heading.style.fontSize = ".95rem";
+
+        description.textContent =
+          item.snippet || "No description available.";
+
+        source.textContent =
+          "Source: " + (item.site_name || "Unknown");
+
+        if (item.date) {
+          source.textContent += " · " + item.date;
+        }
+
+        link.textContent = "Read original source";
+        link.href = item.url || "#";
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+
+        if (!item.url) {
+          link.removeAttribute("href");
+        }
+
+        card.append(heading, description, source, link);
+        results.appendChild(card);
+      });
+
+      status.textContent =
+        `Showing ${data.results.length} search results.`;
+
+    } catch (error) {
+      console.error("TinyFish dashboard error:", error);
+      status.textContent =
+        "Unable to load updates. Check that the backend is running.";
+
+    } finally {
+      button.disabled = false;
+    }
+  });
+}

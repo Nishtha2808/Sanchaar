@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const pool = require('./frontend/db');
-const authStore = require('./authStore');
+const authStore = require('./backend/authStore');
 
 const app = express();
 app.use(cors());
@@ -147,3 +147,4 @@ app.post('/api/auth/resend-otp', (req, res) => {
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Sanchaar backend running on http://localhost:${PORT}`));
+

@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -5,155 +6,307 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sanchaar — Authority Portal</title>
 <link rel="stylesheet" href="style.css">
+
 <style>
-  /* Scoped styles for the quick-action modal + toast — self-contained,
-     reuses the same CSS custom properties defined globally in style.css. */
-  .modal-overlay{
-    display:none;
-    position:fixed; inset:0;
-    background:rgba(6,10,20,.6);
-    align-items:center; justify-content:center;
-    z-index:100;
-    padding:16px;
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(6,10,20,.6);
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 16px;
   }
-  .modal-overlay.open{ display:flex; }
-  .modal-card{
-    width:100%; max-width:380px;
-    background:#fff;
-    border-radius:14px;
-    padding:22px;
-    box-shadow:0 20px 60px rgba(0,0,0,.35);
-  }
-  .modal-head{
-    display:flex; align-items:center; justify-content:space-between;
-    margin-bottom:16px;
-  }
-  .modal-head h3{
-    font-family:var(--font-display); font-size:1.05rem; margin:0;
-  }
-  .modal-close{
-    background:none; border:none; font-size:1.3rem; line-height:1;
-    color:var(--ink-500); cursor:pointer; padding:2px 6px;
-  }
-  .modal-field{ margin-bottom:14px; }
-  .modal-field label{
-    display:block; font-size:.75rem; font-weight:600; text-transform:uppercase;
-    letter-spacing:.03em; color:var(--ink-500); margin-bottom:6px;
-  }
-  .modal-field input, .modal-field select{
-    width:100%; box-sizing:border-box;
-    border:1px solid #dfe3ea; border-radius:8px;
-    padding:10px 12px; font-size:.9rem; font-family:inherit;
-    outline:none;
-  }
-  .modal-field input:focus, .modal-field select:focus{ border-color:var(--indigo-500); }
 
-  .toast{
-    position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(20px);
-    background:var(--navy-950, #0b1220); color:#fff;
-    padding:12px 18px; border-radius:10px; font-size:.85rem;
-    box-shadow:0 10px 30px rgba(0,0,0,.3);
-    opacity:0; pointer-events:none;
-    transition:opacity 200ms ease, transform 200ms ease;
-    z-index:200;
-    max-width:90vw;
-  }
-  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  .modal-overlay.open { display: flex; }
 
-  .mini-alert.resolved{
-    opacity:.5;
+  .modal-card {
+    width: 100%;
+    max-width: 380px;
+    background: #fff;
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.35);
   }
-  .mini-alert .dot.monitoring{ background:var(--amber-500); }
 
-  /* ==== Admin User → Log out dropdown ==== */
-  .side-foot{
-    position:relative;
-    cursor:pointer;
-    user-select:none;
+  .modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
   }
-  .side-foot-chevron{
-    margin-left:auto;
-    color:rgba(255,255,255,.4);
-    transition:transform 150ms ease;
-    flex-shrink:0;
+
+  .modal-head h3 {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    margin: 0;
   }
-  .side-foot.open .side-foot-chevron{
-    transform:rotate(180deg);
+
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    line-height: 1;
+    color: var(--ink-500);
+    cursor: pointer;
+    padding: 2px 6px;
   }
-  .side-foot-menu{
-    display:none;
-    position:absolute;
-    bottom:calc(100% + 8px);
-    left:0;
-    right:0;
-    background:#131b2c;
-    border:1px solid rgba(255,255,255,.1);
-    border-radius:10px;
-    padding:6px;
-    box-shadow:0 12px 30px rgba(0,0,0,.4);
-    z-index:50;
+
+  .modal-field { margin-bottom: 14px; }
+
+  .modal-field label {
+    display: block;
+    font-size: .75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    color: var(--ink-500);
+    margin-bottom: 6px;
   }
-  .side-foot-menu.open{ display:block; }
-  .side-foot-menu button{
-    width:100%;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    background:none;
-    border:none;
-    color:#ff8a94;
-    font-family:'Space Grotesk', sans-serif;
-    font-size:.85rem;
-    font-weight:600;
-    padding:9px 10px;
-    border-radius:6px;
-    cursor:pointer;
-    text-align:left;
+
+  .modal-field input,
+  .modal-field select {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #dfe3ea;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: .9rem;
+    font-family: inherit;
+    outline: none;
   }
-  .side-foot-menu button:hover{
-    background:rgba(255,71,87,.12);
+
+  .modal-field input:focus,
+  .modal-field select:focus {
+    border-color: var(--indigo-500);
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 22px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--navy-950, #0b1220);
+    color: #fff;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-size: .85rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,.3);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease, transform 200ms ease;
+    z-index: 200;
+    max-width: 90vw;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .mini-alert.resolved { opacity: .5; }
+  .mini-alert .dot.monitoring { background: var(--amber-500); }
+
+  /* Admin User dropdown */
+  .side-foot {
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .side-foot-chevron {
+    margin-left: auto;
+    color: rgba(255,255,255,.4);
+    transition: transform 150ms ease;
+    flex-shrink: 0;
+  }
+
+  .side-foot.open .side-foot-chevron { transform: rotate(180deg); }
+
+  .side-foot-menu {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: #131b2c;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 10px;
+    padding: 6px;
+    box-shadow: 0 12px 30px rgba(0,0,0,.4);
+    z-index: 50;
+  }
+
+  .side-foot-menu.open { display: block; }
+
+  .side-foot-menu button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: #ff8a94;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: .85rem;
+    font-weight: 600;
+    padding: 9px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .side-foot-menu button:hover {
+    background: rgba(255,71,87,.12);
+  }
+
+  /* TinyFish transport search */
+  .tinyfish-search-form {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .tinyfish-search-input {
+    flex: 1;
+    min-width: 200px;
+    padding: 12px;
+    border: 1px solid #dfe3ea;
+    border-radius: 8px;
+    font: inherit;
+    outline: none;
+    box-sizing: border-box;
+  }
+
+  .tinyfish-search-input:focus {
+    border-color: var(--indigo-500);
+  }
+
+  #tinyfish-status {
+    margin-top: 14px;
+    font-size: .85rem;
+    color: var(--ink-500);
+  }
+
+  #tinyfish-results {
+    margin-top: 8px;
+  }
+
+  .tinyfish-result {
+    margin-top: 12px;
+    padding: 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow-wrap: anywhere;
+  }
+
+  .tinyfish-result h3 {
+    font-size: .95rem;
+    margin: 0 0 8px;
+  }
+
+  .tinyfish-result p {
+    font-size: .85rem;
+    margin: 6px 0;
+    color: var(--ink-500);
+  }
+
+  .tinyfish-result a {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: .85rem;
+    color: var(--indigo-500);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .tinyfish-result a:hover { text-decoration: underline; }
+
+  .tinyfish-note {
+    font-size: .78rem;
+    color: var(--ink-500);
+    margin-top: 12px;
+  }
+
+  @media (max-width: 520px) {
+    .tinyfish-search-form button { width: 100%; }
   }
 </style>
 </head>
-<body>
 
+<body>
 <div class="dash-shell">
 
-  <!-- ================= Sidebar ================= -->
+  <!-- Sidebar -->
   <aside class="dash-sidebar">
     <div class="brand">
       <span class="brand-mark" style="width:28px;height:28px;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 16V7a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+          <path d="M4 16V7a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v9"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
       </span>
       Sanchaar
     </div>
+
     <nav class="side-nav">
       <a href="#" class="active" data-section="dashboard">
-        <svg class="icon" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.7"/><rect x="13" y="3" width="8" height="5" rx="1.5" stroke="currentColor" stroke-width="1.7"/><rect x="13" y="12" width="8" height="9" rx="1.5" stroke="currentColor" stroke-width="1.7"/><rect x="3" y="14" width="8" height="7" rx="1.5" stroke="currentColor" stroke-width="1.7"/></svg>
+        <svg class="icon" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.7"/>
+          <rect x="13" y="3" width="8" height="5" rx="1.5" stroke="currentColor" stroke-width="1.7"/>
+          <rect x="13" y="12" width="8" height="9" rx="1.5" stroke="currentColor" stroke-width="1.7"/>
+          <rect x="3" y="14" width="8" height="7" rx="1.5" stroke="currentColor" stroke-width="1.7"/>
+        </svg>
         Dashboard
       </a>
+
       <a href="#" data-section="fleet">
-        <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M4 16V9a2 2 0 0 1 2-2h9l5 5v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <svg class="icon" viewBox="0 0 24 24" fill="none">
+          <path d="M4 16V9a2 2 0 0 1 2-2h9l5 5v4"
+                stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
         Fleet Management
       </a>
+
       <a href="#" data-section="demand">
-        <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M4 19V10m6 9V5m6 14v-7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <svg class="icon" viewBox="0 0 24 24" fill="none">
+          <path d="M4 19V10m6 9V5m6 14v-7"
+                stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
         Demand &amp; Analytics
       </a>
+
       <a href="#" data-section="crowding">
-        <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9Z" stroke="currentColor" stroke-width="1.7"/></svg>
+        <svg class="icon" viewBox="0 0 24 24" fill="none">
+          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9Z"
+                stroke="currentColor" stroke-width="1.7"/>
+        </svg>
         Alerts
       </a>
+
       <a href="#" data-section="announcements">
-        <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M12 20V10m-6 10V4m12 16v-6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <svg class="icon" viewBox="0 0 24 24" fill="none">
+          <path d="M12 20V10m-6 10V4m12 16v-6"
+                stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
         Announcements
       </a>
+
       <a href="#" data-section="reports">
-        <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M6 3h9l3 3v15H6z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+        <svg class="icon" viewBox="0 0 24 24" fill="none">
+          <path d="M6 3h9l3 3v15H6z"
+                stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+        </svg>
         Reports
       </a>
+
       <a href="#" data-section="settings">
-        <svg class="icon" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.7"/><path d="M19 12a7 7 0 0 0-.2-1.6l2-1.5-2-3.4-2.3.9a7 7 0 0 0-2.8-1.6L13.3 2h-2.6l-.4 2.8a7 7 0 0 0-2.8 1.6l-2.3-.9-2 3.4 2 1.5a7 7 0 0 0 0 3.2l-2 1.5 2 3.4 2.3-.9a7 7 0 0 0 2.8 1.6l.4 2.8h2.6l.4-2.8a7 7 0 0 0 2.8-1.6l2.3.9 2-3.4-2-1.5c.1-.5.2-1.1.2-1.6Z" stroke="currentColor" stroke-width="1.5"/></svg>
+        <svg class="icon" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.7"/>
+          <path d="M19 12a7 7 0 0 0-.2-1.6l2-1.5-2-3.4-2.3.9a7 7 0 0 0-2.8-1.6L13.3 2h-2.6l-.4 2.8a7 7 0 0 0-2.8 1.6l-2.3-.9-2 3.4 2 1.5a7 7 0 0 0 0 3.2l-2 1.5 2 3.4 2.3-.9a7 7 0 0 0 2.8 1.6l.4 2.8h2.6l.4-2.8a7 7 0 0 0 2.8-1.6l2.3.9 2-3.4-2-1.5c.1-.5.2-1.1.2-1.6Z"
+                stroke="currentColor" stroke-width="1.5"/>
+        </svg>
         Settings
       </a>
     </nav>
@@ -164,82 +317,164 @@
         <div class="name" id="sideFootName">Admin User</div>
         <div class="dept" id="sideFootDept">City Transit Dept.</div>
       </div>
-      <svg class="side-foot-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+      <svg class="side-foot-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
 
       <div class="side-foot-menu" id="sideFootMenu">
         <button type="button" id="logoutBtn">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"
+                  stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M16 17l5-5-5-5M21 12H9"
+                  stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
           Log out
         </button>
       </div>
     </div>
   </aside>
 
-  <!-- ================= Main ================= -->
+  <!-- Main content -->
   <main class="dash-main">
-
     <div class="dash-header">
       <h1 id="dashHeaderTitle">Dashboard</h1>
-      <div class="pill-select"><span class="status-dot live"></span> Live · Today</div>
+      <div class="pill-select">
+        <span class="status-dot live"></span> Live · Today
+      </div>
     </div>
 
-    <!-- ---- Dashboard panel ---- -->
+    <!-- Dashboard panel -->
     <div data-panel="dashboard">
 
+      <!-- KPI cards -->
       <div class="kpi-row">
         <div class="card kpi-card">
           <div class="kpi-icon" style="background:rgba(91,79,233,.12); color:var(--indigo-500);">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 16V9a2 2 0 0 1 2-2h9l5 5v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M4 16V9a2 2 0 0 1 2-2h9l5 5v4"
+                    stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
           </div>
-          <div><div class="kpi-val" id="kpiActiveBuses">47</div><div class="kpi-lbl">Active buses</div></div>
+          <div>
+            <div class="kpi-val" id="kpiActiveBuses">47</div>
+            <div class="kpi-lbl">Active buses</div>
+          </div>
         </div>
+
         <div class="card kpi-card">
           <div class="kpi-icon" style="background:rgba(23,195,178,.12); color:var(--teal-600);">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M9 20l-5.5-2V4L9 6m0 14 6-2m-6 2V6" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M9 20l-5.5-2V4L9 6m0 14 6-2m-6 2V6"
+                    stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            </svg>
           </div>
-          <div><div class="kpi-val" id="kpiActiveRoutes">12</div><div class="kpi-lbl">Active routes</div></div>
+          <div>
+            <div class="kpi-val" id="kpiActiveRoutes">12</div>
+            <div class="kpi-lbl">Active routes</div>
+          </div>
         </div>
+
         <div class="card kpi-card">
           <div class="kpi-icon" style="background:rgba(255,71,87,.12); color:var(--red-500);">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9Z" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9Z"
+                    stroke="currentColor" stroke-width="1.8"/>
+            </svg>
           </div>
-          <div><div class="kpi-val" id="kpiAlertCount">03</div><div class="kpi-lbl">High crowd alerts</div></div>
+          <div>
+            <div class="kpi-val" id="kpiAlertCount">03</div>
+            <div class="kpi-lbl">High crowd alerts</div>
+          </div>
         </div>
       </div>
 
+      <!-- NEW: TinyFish transport updates -->
+      <div class="card panel" id="tinyfish-section" style="margin-bottom:20px;">
+        <div class="panel-head">
+          <h2>Transport Updates</h2>
+          <span class="chip chip-mod">Web Search</span>
+        </div>
+
+        <p style="color:var(--ink-500);font-size:.85rem;margin-bottom:15px;">
+          Search for bus traffic, road disruptions and public transport news.
+        </p>
+
+        <form id="tinyfish-form" class="tinyfish-search-form">
+          <input
+            type="search"
+            id="tinyfish-query"
+            class="tinyfish-search-input"
+            name="q"
+            placeholder="e.g. Delhi bus traffic"
+            value="bus traffic India"
+            required
+          >
+
+          <button type="submit" class="btn btn-indigo" id="tinyfish-search-btn">
+            Search updates
+          </button>
+        </form>
+
+        <p id="tinyfish-status" role="status" aria-live="polite">
+          Enter a search query and click Search updates.
+        </p>
+
+        <div id="tinyfish-results"></div>
+
+        <p class="tinyfish-note">
+          Search results come from the web and may not represent verified
+          real-time bus occupancy or official traffic alerts.
+        </p>
+      </div>
+      <!-- END NEW TinyFish section -->
+
+      <!-- Fleet overview and recent alerts -->
       <div class="dash-grid">
         <div class="card panel">
           <div class="panel-head">
             <h2>Fleet overview</h2>
-            <a href="#" style="font-size:.8rem; color:var(--indigo-500); font-weight:600;">View all</a>
+            <a href="#" style="font-size:.8rem;color:var(--indigo-500);font-weight:600;">View all</a>
           </div>
+
           <table class="table">
-            <thead><tr><th>Bus no.</th><th>Route</th><th>Occupancy</th><th>Status</th><th>Updated</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Bus no.</th><th>Route</th><th>Occupancy</th><th>Status</th><th>Updated</th>
+              </tr>
+            </thead>
             <tbody id="fleetTableBody" class="fleet-table-body">
               <tr data-bus-id="B12">
                 <td class="mono">B12</td><td>RLY → UNI</td>
-                <td style="width:120px;"><div class="progress"><span data-fill="42" style="width:42%; background:var(--green-500);"></span></div></td>
-                <td><span class="chip chip-low">Normal</span></td><td class="mono" style="color:var(--ink-500);">1 min ago</td>
+                <td style="width:120px;"><div class="progress"><span data-fill="42" style="width:42%;background:var(--green-500);"></span></div></td>
+                <td><span class="chip chip-low">Normal</span></td>
+                <td class="mono" style="color:var(--ink-500);">1 min ago</td>
               </tr>
               <tr data-bus-id="B18">
                 <td class="mono">B18</td><td>RLY → UNI</td>
-                <td><div class="progress"><span data-fill="68" style="width:68%; background:var(--amber-500);"></span></div></td>
-                <td><span class="chip chip-mod">Moderate</span></td><td class="mono" style="color:var(--ink-500);">1 min ago</td>
+                <td><div class="progress"><span data-fill="68" style="width:68%;background:var(--amber-500);"></span></div></td>
+                <td><span class="chip chip-mod">Moderate</span></td>
+                <td class="mono" style="color:var(--ink-500);">1 min ago</td>
               </tr>
               <tr data-bus-id="B07">
                 <td class="mono">B07</td><td>RLY → UNI</td>
-                <td><div class="progress"><span data-fill="94" style="width:94%; background:var(--red-500);"></span></div></td>
-                <td><span class="chip chip-high">Critical</span></td><td class="mono" style="color:var(--ink-500);">1 min ago</td>
+                <td><div class="progress"><span data-fill="94" style="width:94%;background:var(--red-500);"></span></div></td>
+                <td><span class="chip chip-high">Critical</span></td>
+                <td class="mono" style="color:var(--ink-500);">1 min ago</td>
               </tr>
               <tr data-bus-id="B21">
                 <td class="mono">B21</td><td>CITY → HOSP</td>
-                <td><div class="progress"><span data-fill="31" style="width:31%; background:var(--green-500);"></span></div></td>
-                <td><span class="chip chip-low">Normal</span></td><td class="mono" style="color:var(--ink-500);">2 min ago</td>
+                <td><div class="progress"><span data-fill="31" style="width:31%;background:var(--green-500);"></span></div></td>
+                <td><span class="chip chip-low">Normal</span></td>
+                <td class="mono" style="color:var(--ink-500);">2 min ago</td>
               </tr>
               <tr data-bus-id="B15">
                 <td class="mono">B15</td><td>MARKET → RLY</td>
-                <td><div class="progress"><span data-fill="55" style="width:55%; background:var(--amber-500);"></span></div></td>
-                <td><span class="chip chip-mod">Moderate</span></td><td class="mono" style="color:var(--ink-500);">2 min ago</td>
+                <td><div class="progress"><span data-fill="55" style="width:55%;background:var(--amber-500);"></span></div></td>
+                <td><span class="chip chip-mod">Moderate</span></td>
+                <td class="mono" style="color:var(--ink-500);">2 min ago</td>
               </tr>
             </tbody>
           </table>
@@ -247,6 +482,7 @@
 
         <div class="card panel">
           <div class="panel-head"><h2>Recent alerts</h2></div>
+
           <div id="recentAlertsList">
             <div class="mini-alert" data-alert-id="b07-rly-uni" data-bus-id="B07" data-route="RLY → UNI">
               <span class="dot"></span>
@@ -256,7 +492,9 @@
               </div>
             </div>
           </div>
+
           <div class="panel-head" style="margin-top:16px;"><h2>Quick actions</h2></div>
+
           <div class="quick-actions">
             <button class="btn btn-outline btn-sm" id="qaDeployBtn">Deploy bus</button>
             <button class="btn btn-outline btn-sm" id="qaAddBusBtn">Add bus</button>
@@ -267,32 +505,49 @@
       </div>
     </div>
 
-    <!-- ---- Crowding alert panel ---- -->
+    <!-- Crowding alerts panel -->
     <div data-panel="crowding" style="display:none;">
       <div class="card panel crowd-panel" style="max-width:520px;" data-alert-id="b07-rly-uni">
         <div class="panel-head">
           <h2 style="color:var(--red-600);">Crowding alert</h2>
         </div>
-        <p class="mono" style="font-size:.85rem; color:var(--ink-500);">Bus B07 · Route: Railway Station → University</p>
-        <p style="font-size:.8rem; color:var(--ink-500); margin-top:10px;">Current occupancy</p>
+
+        <p class="mono" style="font-size:.85rem;color:var(--ink-500);">
+          Bus B07 · Route: Railway Station → University
+        </p>
+
+        <p style="font-size:.8rem;color:var(--ink-500);margin-top:10px;">Current occupancy</p>
         <div class="occ-big">94%</div>
-        <div class="progress" style="margin-top:8px;"><span data-fill="94" style="width:94%; background:var(--red-500);"></span></div>
-
-        <p style="margin-top:16px; font-weight:700; color:var(--red-600); font-size:.85rem;">Overcrowding detected</p>
-        <p style="font-size:.85rem; color:var(--ink-500); margin-top:4px;">Demand on Route RLY → UNI has exceeded recommended capacity.</p>
-
-        <div class="reco-box">
-          <p style="font-size:.8rem; font-weight:700; margin-bottom:10px;">AI recommended action</p>
-          <p style="font-size:.85rem; margin-bottom:8px;">Deploy <strong>B12</strong> to Route RLY → UNI</p>
-          <div class="k">B12 current occupancy</div>
-          <div class="v" style="color:var(--green-600); margin-bottom:8px;">31%</div>
-          <div class="progress" style="margin-bottom:12px;"><span data-fill="31" style="width:31%; background:var(--green-500);"></span></div>
-          <div class="k">Expected occupancy after deployment</div>
-          <div class="v" style="color:var(--amber-600);">58%</div>
-          <div class="progress"><span data-fill="58" style="width:58%; background:var(--amber-500);"></span></div>
+        <div class="progress" style="margin-top:8px;">
+          <span data-fill="94" style="width:94%;background:var(--red-500);"></span>
         </div>
 
-        <button class="btn btn-indigo btn-block" id="deployBusBtn" style="margin-top:14px;">Deploy bus B12</button>
+        <p style="margin-top:16px;font-weight:700;color:var(--red-600);font-size:.85rem;">
+          Overcrowding detected
+        </p>
+        <p style="font-size:.85rem;color:var(--ink-500);margin-top:4px;">
+          Demand on Route RLY → UNI has exceeded recommended capacity.
+        </p>
+
+        <div class="reco-box">
+          <p style="font-size:.8rem;font-weight:700;margin-bottom:10px;">AI recommended action</p>
+          <p style="font-size:.85rem;margin-bottom:8px;">Deploy <strong>B12</strong> to Route RLY → UNI</p>
+          <div class="k">B12 current occupancy</div>
+          <div class="v" style="color:var(--green-600);margin-bottom:8px;">31%</div>
+          <div class="progress" style="margin-bottom:12px;">
+            <span data-fill="31" style="width:31%;background:var(--green-500);"></span>
+          </div>
+          <div class="k">Expected occupancy after deployment</div>
+          <div class="v" style="color:var(--amber-600);">58%</div>
+          <div class="progress">
+            <span data-fill="58" style="width:58%;background:var(--amber-500);"></span>
+          </div>
+        </div>
+
+        <button class="btn btn-indigo btn-block" id="deployBusBtn" style="margin-top:14px;">
+          Deploy bus B12
+        </button>
+
         <div class="quick-actions">
           <button class="btn btn-outline btn-sm" id="qaCrowdDeployB18">Deploy B18</button>
           <button class="btn btn-outline btn-sm" id="qaCrowdHold">Hold &amp; monitor</button>
@@ -300,18 +555,30 @@
       </div>
     </div>
 
-    <!-- ---- Demand & analytics panel ---- -->
+    <!-- Demand and analytics panel -->
     <div data-panel="demand" style="display:none;">
       <div class="card panel">
         <div class="panel-head"><h2>Demand heatmap · Today, 6 PM</h2></div>
+
         <div class="heat-grid">
-          <div class="heat-cell" style="background:var(--red-500);"><div class="name">University Gate</div><div class="val">92</div></div>
-          <div class="heat-cell" style="background:var(--teal-500);"><div class="name">City Hospital</div><div class="val">18</div></div>
-          <div class="heat-cell" style="background:var(--amber-500);"><div class="name">Central Market</div><div class="val">67</div></div>
-          <div class="heat-cell" style="background:var(--amber-500); grid-column: span 3;"><div class="name">Railway Station</div><div class="val">41</div></div>
+          <div class="heat-cell" style="background:var(--red-500);">
+            <div class="name">University Gate</div><div class="val">92</div>
+          </div>
+          <div class="heat-cell" style="background:var(--teal-500);">
+            <div class="name">City Hospital</div><div class="val">18</div>
+          </div>
+          <div class="heat-cell" style="background:var(--amber-500);">
+            <div class="name">Central Market</div><div class="val">67</div>
+          </div>
+          <div class="heat-cell" style="background:var(--amber-500);grid-column:span 3;">
+            <div class="name">Railway Station</div><div class="val">41</div>
+          </div>
         </div>
 
-        <div class="panel-head" style="margin-top:22px;"><h2>Predicted demand — RLY → UNI</h2></div>
+        <div class="panel-head" style="margin-top:22px;">
+          <h2>Predicted demand — RLY → UNI</h2>
+        </div>
+
         <table class="table">
           <thead><tr><th>Time</th><th>Occupancy</th></tr></thead>
           <tbody>
@@ -321,65 +588,85 @@
             <tr><td>+45 min</td><td><span class="chip chip-high">94%</span></td></tr>
           </tbody>
         </table>
-        <p style="margin-top:14px; font-size:.85rem; color:var(--red-600); font-weight:600;">⚠ High occupancy predicted in 30 min — prepare additional bus.</p>
+
+        <p style="margin-top:14px;font-size:.85rem;color:var(--red-600);font-weight:600;">
+          ⚠ High occupancy predicted in 30 min — prepare additional bus.
+        </p>
       </div>
     </div>
 
-    <!-- ---- Fleet Management panel ---- -->
+    <!-- Fleet management panel -->
     <div data-panel="fleet" style="display:none;">
       <div class="card panel">
         <div class="panel-head">
           <h2>Fleet Management</h2>
           <button class="btn btn-indigo btn-sm" id="qaAddBusBtn2">Add bus</button>
         </div>
+
         <table class="table">
-          <thead><tr><th>Bus no.</th><th>Route</th><th>Occupancy</th><th>Status</th><th>Updated</th><th></th></tr></thead>
+          <thead>
+            <tr><th>Bus no.</th><th>Route</th><th>Occupancy</th><th>Status</th><th>Updated</th><th></th></tr>
+          </thead>
           <tbody id="fleetManagementTableBody" class="fleet-table-body">
-              <tr data-bus-id="B12">
-                <td class="mono">B12</td><td>RLY → UNI</td>
-                <td style="width:120px;"><div class="progress"><span data-fill="42" style="width:42%; background:var(--green-500);"></span></div></td>
-                <td><span class="chip chip-low">Normal</span></td><td class="mono" style="color:var(--ink-500);">1 min ago</td>
-                <td><button class="btn btn-outline btn-sm fleet-remove-btn" type="button">Remove</button></td>
-              </tr>
-              <tr data-bus-id="B18">
-                <td class="mono">B18</td><td>RLY → UNI</td>
-                <td><div class="progress"><span data-fill="68" style="width:68%; background:var(--amber-500);"></span></div></td>
-                <td><span class="chip chip-mod">Moderate</span></td><td class="mono" style="color:var(--ink-500);">1 min ago</td>
-                <td><button class="btn btn-outline btn-sm fleet-remove-btn" type="button">Remove</button></td>
-              </tr>
-              <tr data-bus-id="B07">
-                <td class="mono">B07</td><td>RLY → UNI</td>
-                <td><div class="progress"><span data-fill="94" style="width:94%; background:var(--red-500);"></span></div></td>
-                <td><span class="chip chip-high">Critical</span></td><td class="mono" style="color:var(--ink-500);">1 min ago</td>
-                <td><button class="btn btn-outline btn-sm fleet-remove-btn" type="button">Remove</button></td>
-              </tr>
-              <tr data-bus-id="B21">
-                <td class="mono">B21</td><td>CITY → HOSP</td>
-                <td><div class="progress"><span data-fill="31" style="width:31%; background:var(--green-500);"></span></div></td>
-                <td><span class="chip chip-low">Normal</span></td><td class="mono" style="color:var(--ink-500);">2 min ago</td>
-                <td><button class="btn btn-outline btn-sm fleet-remove-btn" type="button">Remove</button></td>
-              </tr>
-              <tr data-bus-id="B15">
-                <td class="mono">B15</td><td>MARKET → RLY</td>
-                <td><div class="progress"><span data-fill="55" style="width:55%; background:var(--amber-500);"></span></div></td>
-                <td><span class="chip chip-mod">Moderate</span></td><td class="mono" style="color:var(--ink-500);">2 min ago</td>
-                <td><button class="btn btn-outline btn-sm fleet-remove-btn" type="button">Remove</button></td>
-              </tr>
+            <tr data-bus-id="B12">
+              <td class="mono">B12</td><td>RLY → UNI</td>
+              <td style="width:120px;"><div class="progress"><span data-fill="42" style="width:42%;background:var(--green-500);"></span></div></td>
+              <td><span class="chip chip-low">Normal</span></td>
+              <td class="mono" style="color:var(--ink-500);">1 min ago</td>
+              <td><button class="btn btn-outline btn-sm fleet-remove-btn" type="button">Remove</button></td>
+            </tr>
+            <tr data-bus-id="B18">
+              <td class="mono">B18</td><td>RLY → UNI</td>
+              <td><div class="progress"><span data-fill="68" style="width:68%;background:var(--amber-500);"></span></div></td>
+              <td><span class="chip chip-mod">Moderate</span></td>
+              <td class="mono" style="color:var(--ink-500);">1 min ago</td>
+              <td><button class="btn btn-outline btn-sm fleet-remove-btn" type="button">Remove</button></td>
+            </tr>
+            <tr data-bus-id="B07">
+              <td class="mono">B07</td><td>RLY → UNI</td>
+              <td><div class="progress"><span data-fill="94" style="width:94%;background:var(--red-500);"></span></div></td>
+              <td><span class="chip chip-high">Critical</span></td>
+              <td class="mono" style="color:var(--ink-500);">1 min ago</td>
+              <td><button class="btn btn-outline btn-sm fleet-remove-btn" type="button">Remove</button></td>
+            </tr>
+            <tr data-bus-id="B21">
+              <td class="mono">B21</td><td>CITY → HOSP</td>
+              <td><div class="progress"><span data-fill="31" style="width:31%;background:var(--green-500);"></span></div></td>
+              <td><span class="chip chip-low">Normal</span></td>
+              <td class="mono" style="color:var(--ink-500);">2 min ago</td>
+              <td><button class="btn btn-outline btn-sm fleet-remove-btn" type="button">Remove</button></td>
+            </tr>
+            <tr data-bus-id="B15">
+              <td class="mono">B15</td><td>MARKET → RLY</td>
+              <td><div class="progress"><span data-fill="55" style="width:55%;background:var(--amber-500);"></span></div></td>
+              <td><span class="chip chip-mod">Moderate</span></td>
+              <td class="mono" style="color:var(--ink-500);">2 min ago</td>
+              <td><button class="btn btn-outline btn-sm fleet-remove-btn" type="button">Remove</button></td>
+            </tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- ---- Announcements panel ---- -->
+    <!-- Announcements panel -->
     <div data-panel="announcements" style="display:none;">
       <div class="card panel" style="max-width:560px;">
         <div class="panel-head"><h2>Post an announcement</h2></div>
+
         <form id="announceForm">
-          <div class="modal-field"><label for="announceTitle">Title</label><input id="announceTitle" placeholder="e.g. Route diversion near Central Market" required></div>
-          <div class="modal-field"><label for="announceMessage">Message</label><input id="announceMessage" placeholder="Details passengers should know" required></div>
+          <div class="modal-field">
+            <label for="announceTitle">Title</label>
+            <input id="announceTitle" placeholder="e.g. Route diversion near Central Market" required>
+          </div>
+          <div class="modal-field">
+            <label for="announceMessage">Message</label>
+            <input id="announceMessage" placeholder="Details passengers should know" required>
+          </div>
           <button type="submit" class="btn btn-indigo btn-block">Post announcement</button>
         </form>
+
         <div class="panel-head" style="margin-top:18px;"><h2>Recent announcements</h2></div>
+
         <div id="announcementsList">
           <div class="mini-alert">
             <span class="dot" style="background:var(--indigo-500);"></span>
@@ -392,13 +679,14 @@
       </div>
     </div>
 
-    <!-- ---- Reports panel ---- -->
+    <!-- Reports panel -->
     <div data-panel="reports" style="display:none;">
       <div class="card panel">
         <div class="panel-head">
           <h2>Reports</h2>
           <button class="btn btn-indigo btn-sm" id="generateReportBtn">Generate report</button>
         </div>
+
         <table class="table">
           <thead><tr><th>Report</th><th>Period</th><th>Generated</th><th></th></tr></thead>
           <tbody id="reportsTableBody">
@@ -419,55 +707,65 @@
       </div>
     </div>
 
-    <!-- ---- Settings panel ---- -->
+    <!-- Settings panel -->
     <div data-panel="settings" style="display:none;">
       <div class="card panel" style="max-width:480px;">
         <div class="panel-head"><h2>Settings</h2></div>
+
         <form id="settingsForm">
-          <div class="modal-field"><label for="settingsName">Display name</label><input id="settingsName" value="Admin User" required></div>
-          <div class="modal-field"><label for="settingsDept">Department</label><input id="settingsDept" value="City Transit Dept." required></div>
           <div class="modal-field">
-            <label style="display:flex; align-items:center; gap:8px; text-transform:none; font-weight:500; font-size:.85rem; color:var(--ink-700);">
-              <input type="checkbox" id="settingsEmailAlerts" checked style="width:auto;"> Email alerts for critical occupancy
+            <label for="settingsName">Display name</label>
+            <input id="settingsName" value="Admin User" required>
+          </div>
+
+          <div class="modal-field">
+            <label for="settingsDept">Department</label>
+            <input id="settingsDept" value="City Transit Dept." required>
+          </div>
+
+          <div class="modal-field">
+            <label style="display:flex;align-items:center;gap:8px;text-transform:none;font-weight:500;font-size:.85rem;color:var(--ink-700);">
+              <input type="checkbox" id="settingsEmailAlerts" checked style="width:auto;">
+              Email alerts for critical occupancy
             </label>
           </div>
+
           <div class="modal-field">
-            <label style="display:flex; align-items:center; gap:8px; text-transform:none; font-weight:500; font-size:.85rem; color:var(--ink-700);">
-              <input type="checkbox" id="settingsSmsAlerts" style="width:auto;"> SMS alerts for critical occupancy
+            <label style="display:flex;align-items:center;gap:8px;text-transform:none;font-weight:500;font-size:.85rem;color:var(--ink-700);">
+              <input type="checkbox" id="settingsSmsAlerts" style="width:auto;">
+              SMS alerts for critical occupancy
             </label>
           </div>
+
           <button type="submit" class="btn btn-indigo btn-block">Save changes</button>
         </form>
       </div>
     </div>
-
   </main>
 </div>
 
-<!-- ============ Add bus / Add route modal ============ -->
+<!-- Add bus / Add route modal -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal-card">
     <div class="modal-head">
       <h3 id="modalTitle">Add bus</h3>
       <button class="modal-close" id="modalCloseBtn" aria-label="Close">&times;</button>
     </div>
+
     <form id="modalForm">
-      <div id="modalFields"><!-- populated by JS depending on Add bus / Add route --></div>
+      <div id="modalFields"></div>
       <button type="submit" class="btn btn-indigo btn-block" id="modalSubmitBtn">Add</button>
     </form>
   </div>
 </div>
 
-<!-- ============ Toast (action confirmations) ============ -->
+<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script src="script.js"></script>
+
 <script>
-/* ============================================================
-   Admin User → Log out dropdown
-   Clears the session written by login.html (sanchaarAuthToken /
-   sanchaarAuthEmployee) and sends the user back to sign in.
-   ============================================================ */
+/* Admin User → Log out dropdown */
 (function () {
   const sideFootTrigger = document.getElementById('sideFootTrigger');
   const sideFootMenu = document.getElementById('sideFootMenu');
@@ -496,4 +794,4 @@
 })();
 </script>
 </body>
-</html>    
+</html>
